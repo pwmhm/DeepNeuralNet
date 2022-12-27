@@ -4,11 +4,16 @@ class loss():
     def __init__(self):
         self.loss_mean = []
         self.loss_modules = []
+        self.record = []
         self.weights=[]
-    def __call__(self, pred, truth):
+    def __call__(self, pred, truth, eval=True):
         _loss=0
+        _deriv=0
         for modules, weight in zip(self.loss_modules, self.weights):
             _loss += modules(pred,truth) * weight
+            if not eval:
+                _deriv += locals()[f'{modules.__name__}_derivative'](pred, truth) * weight
+        self.record.append(_deriv)
         self.loss_mean.append(_loss)
         return _loss
 
@@ -17,10 +22,6 @@ class loss():
     
     def get_mean(self):
         return np.mean(self.loss_mean)
-
-    def _backward(self, pred, truth):
-        pass
-
 
     def add(self, loss, weight):
         self.loss_modules.append(loss)
@@ -33,7 +34,6 @@ def mse(pred, truth):
 def mse_derivative(pred, truth):
     retval = 2*(pred-truth)
     return np.mean(retval)
-
 
 def rmse(pred, truth):
     _mse = mse(pred, truth)
