@@ -33,10 +33,11 @@ class Model():
     self.record = []
 
   def net_print(self):
-    print(f"Net:(")
+    retval = f"Net:(\n"
     for layers in self.backbone:
-      print(f"{layers.identity},")
-    print(")")
+      retval += f"{layers.identity},\n"
+    retval += ")"
+    return retval
 
   def add(self, layer):
     self.backbone.append(layer)
@@ -55,6 +56,9 @@ class Model():
     return retval
 
   def train(self, dataset, learning_rate, loss, metric, epochs):
+    """
+    This should be the default training schema.
+    """
     self.lr = learning_rate
     self.data = dataset
     self.loss_module = loss
@@ -75,7 +79,6 @@ class Model():
 
         # backpropagate
         self.backward()
-
 
   def backward(self):
     temp_name = []
