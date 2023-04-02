@@ -10,4 +10,4 @@ TBD
 
 # References
 
-I intend to build this using purely theoretical knowledge of neural network. So this (hopefully) should be an original implementation of NN, however inefficient it is. Theories are largely gathered from Wikipedia, and Andrew Ng Machine Learning Course 1 to 10.
+I intend to build this in python using purely theoretical knowledge of the neural network. So this (hopefully) should be an original implementation of NN, however inefficient it is. Theories are largely gathered from Wikipedia, and Andrew Ng Machine Learning Course 1 to 10.
