@@ -11,9 +11,9 @@ class loss():
         _deriv=0
         for modules, weight in zip(self.loss_modules, self.weights):
             _loss += modules(pred,truth) * weight
-            if not eval:
-                _deriv += locals()[f'{modules.__name__}_derivative'](pred, truth) * weight
-        self.record.append(_deriv)
+            if eval:
+                _deriv += globals()[f'{modules.__name__}_derivative'](pred, truth) * weight
+        self.record = _deriv
         self.loss_mean.append(_loss)
         return _loss
 
@@ -29,12 +29,12 @@ class loss():
 
 def mse(pred, truth):
     retval = np.power((pred-truth), 2)
-    return np.mean(retval)
+    return retval
 
 def mse_derivative(pred, truth):
     retval = 2*(pred-truth)
-    return np.mean(retval)
+    return retval
 
 def rmse(pred, truth):
     _mse = mse(pred, truth)
-    return np.sqrt(_mse)
+    return _mse

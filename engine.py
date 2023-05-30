@@ -23,8 +23,7 @@ class Layer():
     """
     Does forward propagation TO the derivative of the activation function (Necessary for backprop).
     """
-    retval = np.matmul(input, self.weights)
-    return self.derivative(retval)
+    return self.derivative(input)
 
 class Model():
   def __init__(self, eval=True):
@@ -70,27 +69,40 @@ class Model():
     # TODO mini-batch and full-batch implementation
     for i in range(self.epochs):
       # iterate over training data
+      print(f"Epoch: {i}")
+      # for layers in self.backbone:
+      #   print(layers.weights)
       for input, gt in dataset:
         # calculate predicted output (stored in self.record)
-        self.forward(input)
+        out = self.forward(input)
 
         # calculate loss and derivatives
-        self.loss_module(input, gt, self.eval, False)
+        self.loss_module(out, gt, self.eval)
 
         # backpropagate
         self.backward()
 
   def backward(self):
+    # TODO fix the backprop logic
+
     temp_name = []
-    for layer in range(len(self.backbone)-1, -1, -1):
-      if layer == len(self.backbone)-1:
-        # if it's the last layer, gradient calculation should be different
-        gradient = self.backbone[layer].backward(self.record[layer-1]) * np.mean(self.loss_module.record)
-        temp_name.append(gradient)
-      else:
-        gradient = self.backbone[layer].backward(self.record[layer-1]) * self.backbone[layer].weights
-        gradient = np.matmul(gradient, temp_name[-1])
+
+    # calculate loss derivative
+    temp_name.append(self.loss_module.record)
+
+    # last layer
+    # 3x2 to 2x2 to 2x1
+    # [[i1, i2, i3], ...] * [d11 d12, d21, d22] * [l1, l2]
+    # 3x2 2x1 (hadamard)
+
+    # iterate over layers
+    for layer in range(len(self.backbone)-1, 0, -1):
+        if layer == len(self.backbone)-1:
+          cur_layer_drv = np.matmul(self.backbone[layer].backward(self.record[layer-1]),temp_name[-1])
+        else:
+          cur_layer_drv = self.backbone[layer].backward(self.record[layer-1]).dot(np.transpose(self.backbone[layer+1].weights)).dot(temp_name[-1])
+        gradient = [self.record[layer-1] for i in range(self.backbone[layer].weights.shape[0])] * cur_layer_drv
         temp_name.append(gradient)
 
       # update the weights
-      self.backbone[layer].weights = self.backbone[layer].weights - self.lr*gradient
+        self.backbone[layer].weights = self.backbone[layer].weights - self.lr*gradient

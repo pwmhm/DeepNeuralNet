@@ -27,8 +27,8 @@ class Dataloader():
         self._length = len(self.input)//Batch
         self._index = 0
 
-        self.input = np.array_split(self.input, self._length)
-        self.gt = np.array_split(self.input, self._length)
+        # self.input = np.array_split(self.input, self._length)
+        # self.gt = np.array_split(self.gt, self._length)
 
     def __next__(self):
         if self._index < self._length:
