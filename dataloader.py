@@ -36,6 +36,7 @@ class Dataloader():
             self._index +=1
             return retval
         else:
+            self._index = 0
             raise StopIteration
 
     def __iter__(self):

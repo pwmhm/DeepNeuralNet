@@ -77,8 +77,8 @@ class Model():
         out = self.forward(input)
 
         # calculate loss and derivatives
-        self.loss_module(out, gt, self.eval)
-
+        _ = self.loss_module(out, gt, self.eval)
+        
         # backpropagate
         self.backward()
 
@@ -98,11 +98,11 @@ class Model():
     # iterate over layers
     for layer in range(len(self.backbone)-1, 0, -1):
         if layer == len(self.backbone)-1:
-          cur_layer_drv = np.matmul(self.backbone[layer].backward(self.record[layer-1]),temp_name[-1])
+          cur_layer_drv = np.matmul(np.transpose([self.backbone[layer].backward(self.record[layer-1]) for i in range(len(temp_name[-1]))]),temp_name[-1])
         else:
           cur_layer_drv = self.backbone[layer].backward(self.record[layer-1]).dot(np.transpose(self.backbone[layer+1].weights)).dot(temp_name[-1])
-        gradient = [self.record[layer-1] for i in range(self.backbone[layer].weights.shape[0])] * cur_layer_drv
+        gradient = [self.record[layer-1] for i in range(self.backbone[layer].weights.shape[1])] * cur_layer_drv
         temp_name.append(gradient)
 
       # update the weights
-        self.backbone[layer].weights = self.backbone[layer].weights - self.lr*gradient
+        self.backbone[layer].weights = self.backbone[layer].weights - np.transpose(self.lr*gradient)
